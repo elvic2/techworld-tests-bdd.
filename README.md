@@ -1,4 +1,4 @@
-# 🛍️ TechWorld - Pruebas Automatizadas con Behave
+# 🛍️ TechWorld - Pruebas Automatizadas con Behave ATDD
 
 ## 📌 Descripción
 Este proyecto contiene pruebas automatizadas para la plataforma de e-commerce **TechWorld**, utilizando **Behave** y el lenguaje **Gherkin**.  
