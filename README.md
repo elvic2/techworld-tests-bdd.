@@ -45,3 +45,32 @@ techworld-tests/
 │── requirements.txt                  # Dependencias del proyecto
 │── behave.ini                        # Configuración adicional de Behave
 │── README.md                         # Documentación del proyecto
+
+---
+
+## 📥 **Instalación y Configuración**
+### 1️⃣ **Clonar el Repositorio**
+```bash
+git clone ttps://github.com/elvic2/PruebasFuncionalesVictor.git
+cd techworld-tests
+
+2️⃣ Crear y Activar el Entorno Virtual
+    python3 -m venv venv
+    source venv/bin/activate   # En macOS/Linux
+    venv\Scripts\activate      # En Windows
+
+3️⃣ Instalar Dependencias
+    pip install -r requirements.txt
+
+✅ Ejecución de las Pruebas
+    #TODAS
+    behave --verbose
+
+    ##ESPECIFICAS
+    behave features/authentication.feature
+    behave features/orders_tracking.feature
+    behave features/cart_management.feature
+    behave features/product_management.feature
+
+Autor: Victor Hugo Vargas Franco, Pruebas de requisitos funcioanales
+📩 Email: victorh.vargasf@autonoma.edu.co

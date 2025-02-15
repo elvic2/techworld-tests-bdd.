@@ -1,0 +1,44 @@
+# 🛑 Archivos y carpetas de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+
+# 🛑 Entorno Virtual de Python
+venv/
+env/
+.venv/
+*.env
+
+# 🛑 Configuración de Behave y caché
+*.behave
+reports/
+allure-results/
+behave.ini
+
+# 🛑 Archivos de configuración del sistema operativo
+.DS_Store
+Thumbs.db
+
+# 🛑 Dependencias instaladas
+pip-log.txt
+pip-selfcheck.json
+
+# 🛑 Archivos de configuración de editores
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# 🛑 Archivos de simulación de base de datos (JSON de datos de prueba)
+data/users.json
+data/orders.json
+data/cart.json
+data/wishlist.json
+data/products.json
+
+# 🛑 Archivos temporales o de debugging
+*.tmp
+*.swp
+debug.log
