@@ -1,0 +1,17 @@
+{
+    "victor.vargas@example.com": {
+        "password": "Victor123",
+        "activo": true,
+        "intentos_fallidos": 0
+    },
+    "dayro.moreno@example.com": {
+        "password": "Dayro123",
+        "activo": false,
+        "intentos_fallidos": 15
+    },
+    "cristiano.ronaldo@example.com": {
+        "password": "CR7GOAT",
+        "activo": true,
+        "intentos_fallidos": 0
+    }
+}
