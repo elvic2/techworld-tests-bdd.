@@ -2,36 +2,27 @@ import json
 import os
 from behave import given, when, then
 
-PRODUCTS_FILE = "products.json"
+PRODUCTS_FILE = "data/products.json"
 
-# Función para cargar productos desde el JSON
 def cargar_productos():
     if os.path.exists(PRODUCTS_FILE):
         with open(PRODUCTS_FILE, "r") as file:
             return json.load(file)
     return {}
 
-# Función para guardar productos en el JSON
 def guardar_productos(data):
     with open(PRODUCTS_FILE, "w") as file:
         json.dump(data, file, indent=4)
 
-# Cargar productos registrados
 productos_registrados = cargar_productos()
 
-### **PASOS PARA CREACIÓN DE PRODUCTOS**
-@given('que el administrador ha iniciado sesión en la plataforma')
-def step_given_admin_logeado(context):
+@given('el administrador accede a la sección de gestión de productos')
+def step_given_admin_gestion_productos(context):
     context.admin_autenticado = True
-    print("Administrador autenticado en la plataforma")
+    print("El administrador ha accedido a la sección de gestión de productos.")
 
-@when('accede a la sección de gestión de productos')
-def step_when_admin_gestion_productos(context):
-    assert context.admin_autenticado, "El administrador debe estar autenticado"
-    print("Administrador accede a la gestión de productos")
-
-@when('completa los campos obligatorios (nombre, descripción, precio, stock, categoría)')
-def step_when_completa_campos_producto(context):
+@when('completa los datos y guarda el nuevo producto')
+def step_when_admin_crea_producto(context):
     context.producto = {
         "id": "PROD789",
         "nombre": "Teclado Mecánico RGB",
@@ -40,93 +31,84 @@ def step_when_completa_campos_producto(context):
         "stock": 50,
         "categoria": "Periféricos"
     }
-    print("Administrador ha completado los campos del producto")
-
-@when('guarda el producto')
-def step_when_guardar_producto(context):
     productos_registrados[context.producto["id"]] = context.producto
     guardar_productos(productos_registrados)
-    print("Producto guardado en el catálogo")
+    print(f"El producto {context.producto['nombre']} ha sido agregado al catálogo.")
 
-@then('el sistema debe registrar el nuevo producto en el catálogo')
-def step_then_producto_registrado(context):
+@then('el producto se agrega al catálogo')
+def step_then_producto_en_catalogo(context):
     assert context.producto["id"] in productos_registrados
-    print(f"Producto {context.producto['nombre']} registrado en el catálogo")
+    print(f"{context.producto['nombre']} está disponible en el catálogo.")
 
-@then('mostrar un mensaje de confirmación de creación de producto')
-def step_then_mensaje_confirmacion_creacion_producto(context):
-    print(f"Mensaje: Producto {context.producto['nombre']} ha sido creado exitosamente")
+@then('los clientes pueden verlo en la tienda')
+def step_then_producto_visible_tienda(context):
+    print(f"{context.producto['nombre']} ahora es visible en la tienda.")
 
-### **PASOS PARA CREACIÓN DE PRODUCTOS CON DATOS INCOMPLETOS**
-@given('que el administrador intenta agregar un producto nuevo')
-def step_given_admin_intenta_agregar_producto(context):
-    context.producto = {"nombre": "", "precio": 100}  # Simulando un campo faltante
-    print("Administrador intenta agregar un producto sin completar todos los campos")
+@given('el administrador intenta registrar un producto nuevo')
+def step_given_admin_intenta_crear_producto(context):
+    context.producto = {"nombre": "", "precio": 100}  # Simulación de campo vacío
+    print("El administrador intenta registrar un producto sin completar todos los campos.")
 
-@when('omite un campo obligatorio')
+@when('deja un campo obligatorio vacío')
 def step_when_omite_campo_obligatorio(context):
     assert "nombre" in context.producto and context.producto["nombre"] == ""
-    print("Falta completar un campo obligatorio")
+    print("El administrador dejó un campo obligatorio vacío.")
 
-@then('el sistema debe mostrar un mensaje de error en la creación de producto')
-def step_then_mensaje_error_creacion_producto(context):
-    print("Error: No se puede crear el producto sin completar todos los campos")
+@then('la plataforma muestra un mensaje de error')
+def step_then_mensaje_error_producto(context):
+    print("Error: No se puede registrar el producto sin completar todos los campos.")
 
-@then('evitar la creación del producto hasta completar la información requerida')
-def step_then_evitar_creacion_producto(context):
-    print("Producto no registrado hasta completar la información")
+@then('evita guardar el producto hasta completar los datos requeridos')
+def step_then_evitar_guardado_producto(context):
+    print("El producto no será guardado hasta que se completen todos los datos.")
 
-@given('que el administrador está en la sección de gestión de productos')
-def step_given_admin_gestionando_productos(context):
+@given('el administrador accede a la lista de productos')
+def step_given_admin_lista_productos(context):
+    # Si el atributo no existe, lo inicializamos en False
     if not hasattr(context, "admin_autenticado"):
-        context.admin_autenticado = True  # Se establece en True si no está definido
+        context.admin_autenticado = True  # Se establece en True para la prueba
     
     assert context.admin_autenticado, "El administrador debe estar autenticado"
-    print("Administrador accede a la sección de gestión de productos")
+    print("El administrador accede a la lista de productos.")
 
-@when('selecciona un producto existente')
-def step_when_admin_selecciona_producto(context):
+@when('edita la descripción y el precio de un producto')
+def step_when_edita_producto(context):
     context.producto_id = "PROD789"
     assert context.producto_id in productos_registrados
-    print(f"Administrador selecciona el producto {context.producto_id}")
-
-@when('edita la descripción y el precio')
-def step_when_edita_producto(context):
     productos_registrados[context.producto_id]["descripcion"] = "Teclado RGB mecánico avanzado"
     productos_registrados[context.producto_id]["precio"] = 90
-    print("Administrador edita la descripción y el precio del producto")
+    print("El administrador ha editado la descripción y el precio del producto.")
 
 @when('guarda los cambios')
 def step_when_guardar_cambios_producto(context):
     guardar_productos(productos_registrados)
-    print("Cambios guardados en el catálogo de productos")
+    print("Los cambios han sido guardados en el catálogo.")
 
-@then('el sistema debe actualizar la información del producto en el catálogo')
+@then('la información del producto se actualiza en el catálogo')
 def step_then_producto_actualizado(context):
-    print(f"Producto {productos_registrados[context.producto_id]['nombre']} actualizado en el catálogo")
+    print(f"El producto {productos_registrados[context.producto_id]['nombre']} ha sido actualizado en el catálogo.")
 
-@then('registrar la modificación en el historial de productos')
-def step_then_registrar_historial_producto(context):
-    print(f"Historial actualizado: Producto {productos_registrados[context.producto_id]['nombre']} fue modificado")
+@then('el historial de modificaciones se registra correctamente')
+def step_then_registro_historial(context):
+    print(f"El historial de cambios ha sido actualizado para {productos_registrados[context.producto_id]['nombre']}.")
 
-### **PASOS PARA DISPONIBILIDAD DE PRODUCTO SEGÚN STOCK**
-@given('que un producto está registrado en el sistema')
+@given('un producto está registrado en la tienda')
 def step_given_producto_registrado(context):
     context.producto_id = "PROD789"
     assert context.producto_id in productos_registrados
-    print(f"Producto {context.producto_id} registrado en el sistema")
+    print(f"El producto {context.producto_id} está registrado en la tienda.")
 
-@when('el administrador lo marca como “activo” y tiene stock disponible')
+@when('el administrador lo activa y tiene stock disponible')
 def step_when_producto_marcado_activo(context):
     productos_registrados[context.producto_id]["estado"] = "activo"
     productos_registrados[context.producto_id]["stock"] = 20
     guardar_productos(productos_registrados)
-    print(f"Producto {context.producto_id} marcado como activo con stock disponible")
+    print(f"El producto {context.producto_id} ha sido activado y tiene stock disponible.")
 
-@then('el producto debe aparecer visible en la tienda para los clientes')
-def step_then_producto_visible_tienda(context):
-    print(f"Producto {productos_registrados[context.producto_id]['nombre']} está visible en la tienda")
+@then('el producto se muestra en la tienda para los clientes')
+def step_then_producto_visible_clientes(context):
+    print(f"El producto {productos_registrados[context.producto_id]['nombre']} ahora está disponible en la tienda.")
 
-@then('estar disponible para su compra')
+@then('está disponible para su compra')
 def step_then_producto_disponible_para_compra(context):
-    print(f"Producto {productos_registrados[context.producto_id]['nombre']} disponible para la compra")
+    print(f"El producto {productos_registrados[context.producto_id]['nombre']} está disponible para la compra.")

@@ -2,8 +2,8 @@ import json
 import os
 from behave import given, when, then
 
-CART_FILE = "cart.json"
-WISHLIST_FILE = "wishlist.json"
+CART_FILE = "data/cart.json"
+WISHLIST_FILE = "data/wishlist.json"
 
 def cargar_datos(file):
     if os.path.exists(file):
@@ -18,90 +18,85 @@ def guardar_datos(file, data):
 carrito = cargar_datos(CART_FILE)
 wishlist = cargar_datos(WISHLIST_FILE)
 
-### **PASOS PARA GESTIÓN DEL CARRITO**
-@given('que un usuario autenticado está navegando por el catálogo')
-def step_given_usuario_navega_catalogo(context):
-    context.usuario_autenticado = True
-    print("Usuario autenticado navegando en el catálogo")
-
-@when('selecciona un producto y hace clic en "Agregar al carrito"')
-def step_when_agrega_producto_carrito(context):
+@given('el usuario está viendo un producto en la tienda')
+def step_given_usuario_viendo_producto(context):
     context.producto = {"id": "PROD123", "nombre": "Laptop Gamer", "precio": 1500, "cantidad": 1}
+    print(f"El usuario está viendo el producto: {context.producto['nombre']}")
+
+@when('hace clic en "Agregar al carrito"')
+def step_when_usuario_agrega_al_carrito(context):
     carrito[context.producto["id"]] = context.producto
     guardar_datos(CART_FILE, carrito)
-    print(f"Producto {context.producto['nombre']} agregado al carrito")
+    print(f"El usuario agregó {context.producto['nombre']} al carrito.")
 
-@then('el sistema debe agregar el producto al carrito')
-def step_then_producto_agregado_carrito(context):
+@then('el producto aparece en su carrito de compras')
+def step_then_producto_en_carrito(context):
     assert context.producto["id"] in carrito
-    print("Producto agregado correctamente al carrito")
+    print(f"{context.producto['nombre']} está en el carrito.")
 
-@then('mostrar un mensaje de confirmación del carrito')
-def step_then_mostrar_mensaje_confirmacion_carrito(context):
-    print(f"Mensaje: {context.producto['nombre']} ha sido agregado al carrito")
+@then('recibe una confirmación en pantalla')
+def step_then_mostrar_mensaje_carrito(context):
+    print("Mensaje en pantalla: Producto agregado correctamente al carrito.")
 
-### **PASOS PARA MODIFICAR CANTIDAD EN EL CARRITO**
-@given('que un usuario tiene productos en su carrito')
-def step_given_usuario_con_productos_en_carrito(context):
+@given('el usuario tiene productos en su carrito')
+def step_given_usuario_con_productos_carrito(context):
     assert carrito, "El carrito está vacío"
-    print("Usuario tiene productos en el carrito")
+    print("El usuario tiene productos en su carrito.")
 
-@when('modifica la cantidad de un producto')
-def step_when_modifica_cantidad_producto(context):
+@when('cambia la cantidad de un producto')
+def step_when_usuario_modifica_cantidad(context):
     producto_id = "PROD123"
     if producto_id in carrito:
         carrito[producto_id]["cantidad"] = 2
         guardar_datos(CART_FILE, carrito)
-    print(f"Cantidad de {carrito[producto_id]['nombre']} modificada a {carrito[producto_id]['cantidad']}")
+    print(f"El usuario cambió la cantidad de {carrito[producto_id]['nombre']} a {carrito[producto_id]['cantidad']}.")
 
-@then('el sistema debe recalcular el total del carrito')
+@then('el total del carrito se actualiza automáticamente')
 def step_then_actualizar_total_carrito(context):
     total = sum(p["precio"] * p["cantidad"] for p in carrito.values())
-    print(f"Nuevo total del carrito: ${total}")
+    print(f"El nuevo total del carrito es: ${total}")
 
-@then('reflejar los cambios en el resumen del pedido')
-def step_then_reflejar_cambios_resumen(context):
-    print("Resumen del pedido actualizado con la nueva cantidad de productos")
+@then('el resumen del pedido refleja los cambios')
+def step_then_actualizar_resumen_pedido(context):
+    print("El resumen del pedido se ha actualizado.")
 
-### **PASOS PARA GESTIÓN DE WISHLIST**
-@given('que un usuario autenticado está en la página de un producto')
-def step_given_usuario_en_pagina_producto(context):
+@given('el usuario está viendo un producto que le interesa')
+def step_given_usuario_viendo_producto_interes(context):
     context.producto = {"id": "PROD456", "nombre": "Monitor 4K", "precio": 500}
-    print(f"Usuario viendo el producto {context.producto['nombre']}")
+    print(f"El usuario está viendo el producto: {context.producto['nombre']}")
 
 @when('hace clic en "Agregar a wishlist"')
-def step_when_agrega_producto_wishlist(context):
+def step_when_usuario_agrega_wishlist(context):
     wishlist[context.producto["id"]] = context.producto
     guardar_datos(WISHLIST_FILE, wishlist)
-    print(f"Producto {context.producto['nombre']} agregado a la wishlist")
+    print(f"El usuario agregó {context.producto['nombre']} a la wishlist.")
 
-@then('el producto debe almacenarse en su lista de deseos')
+@then('el producto aparece en su lista de deseos')
 def step_then_producto_en_wishlist(context):
     assert context.producto["id"] in wishlist
-    print(f"{context.producto['nombre']} almacenado en la wishlist correctamente")
+    print(f"{context.producto['nombre']} está en la wishlist.")
 
-@then('ser accesible desde la sección "Mi Wishlist"')
-def step_then_accesible_desde_wishlist(context):
-    print("Wishlist disponible para el usuario")
+@then('puede verlo en la sección "Mi Wishlist"')
+def step_then_acceder_wishlist(context):
+    print("El usuario puede ver su wishlist en la plataforma.")
 
-### **PASOS PARA NOTIFICACIÓN DE STOCK BAJO EN WISHLIST**
-@given('que un usuario tiene productos en su wishlist')
+@given('el usuario tiene productos en su wishlist')
 def step_given_usuario_con_productos_wishlist(context):
     assert wishlist, "La wishlist está vacía"
-    print("Usuario tiene productos en su wishlist")
+    print("El usuario tiene productos guardados en su wishlist.")
 
-@when('un producto de la lista queda sin stock')
+@when('uno de los productos se queda sin stock')
 def step_when_producto_sin_stock(context):
     producto_id = "PROD456"
     if producto_id in wishlist:
-        wishlist[producto_id]["stock"] = 0  # Simular que el producto se agotó
+        wishlist[producto_id]["stock"] = 0
         guardar_datos(WISHLIST_FILE, wishlist)
-    print(f"{wishlist[producto_id]['nombre']} ha quedado sin stock")
+    print(f"{wishlist[producto_id]['nombre']} se quedó sin stock.")
 
-@then('el sistema debe enviar una notificación de stock en wishlist')
-def step_then_enviar_notificacion_stock_wishlist(context):
-    print(f"Notificación enviada: {wishlist['PROD456']['nombre']} está fuera de stock")
+@then('recibe una notificación de alerta')
+def step_then_usuario_recibe_alerta(context):
+    print(f"Notificación en plataforma: {wishlist['PROD456']['nombre']} está fuera de stock.")
 
-@then('mostrar un mensaje de advertencia en la wishlist')
-def step_then_mostrar_mensaje_stock(context):
-    print(f"Advertencia: {wishlist['PROD456']['nombre']} no está disponible actualmente")
+@then('en su wishlist aparece un mensaje de "Sin stock"')
+def step_then_mensaje_sin_stock(context):
+    print("Mensaje en pantalla: Este producto ya no está disponible.")
